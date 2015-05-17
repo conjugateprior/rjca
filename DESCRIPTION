@@ -5,7 +5,7 @@ Version: 0.1
 Date: 2015-05-17
 Author: Will Lowe
 Maintainer: Who to complain to <conjugateprior@gmail.com>
-Description: Wraps Java code in JCA
+Description: Wraps JCA in R. For those who dislike command lines.
 License: GPL
 Imports: rJava
 SystemRequirements: java
