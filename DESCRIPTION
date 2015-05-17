@@ -1,0 +1,12 @@
+Package: rjca
+Type: Package
+Title: R Interface to JCA Tools
+Version: 0.1
+Date: 2015-05-17
+Author: Will Lowe
+Maintainer: Who to complain to <conjugateprior@gmail.com>
+Description: Wraps Java code in JCA
+License: GPL
+Imports: rJava
+SystemRequirements: java
+LazyData: TRUE
