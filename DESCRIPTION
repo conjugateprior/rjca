@@ -7,6 +7,6 @@ Author: Will Lowe
 Maintainer: Who to complain to <conjugateprior@gmail.com>
 Description: Wraps JCA in R. For those who dislike command lines.
 License: GPL
-Imports: rJava
-SystemRequirements: java
+Imports: rJava, Matrix, XML
+SystemRequirements: Java (>= 1.8)
 LazyData: TRUE
