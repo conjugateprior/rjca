@@ -1,0 +1,143 @@
+---
+title: "Counting and viewing words and categories"
+author: "Will Lowe"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+This package consists of R functions to drive the java code in jca tools.  You can find that [here](https://github.com/conjugateprior/jca).  It's a light wrapper and not thoroughly tested, but it might do what you want.  The first task, which is probably the hardest, is to get Java and R working together.  Let's take these in turn and 
+then move on to a content analysis example.
+
+## Getting Java
+
+You want to install the 'JDK' for the latest version of the Java language.  As of 9 May 2015 the latest version of Java is called `Java SE 8u45`.  There are three steps:
+
+ 1. Pressing the big square button with a stylized coffee cup and the words 'Java' and 'Download' on [this page](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+
+ 2. You're now on a page entitled 'Java SE Development Kit 8 Downloads'.  Press the radio button marked 'Accept License Agreement' and click on the link associated with your operating system.
+
+ 3. Now it's time to persuade R to talk to Java.  You can do this by 
+ 
+        install.packages('rJava')
+    
+    If you're incredibly lucky, you're done.  Try typing
+    
+        library(rJava)
+
+    and if that works without complaint, check the version of Java that R sees.  
+    
+        .jinit()
+        .jnew("java/lang/System")$getProperty("java.specification.version")
+
+    It should say "1.8".  If it does not, you need to reconfigure some things before 
+    carrying on.  Have a look at the final section of this vignette for the 
+    gory details.
+
+## Describing documents
+
+Let's start by describing some documents.  We'll use a replication data set from Bara et al.'s analysis of an debate on Abortion in the late 60s in Britain.  The data has been scraped from Hansard and each speaker's contributions concatenated.  Consequently each document is named after the speaker whose contributions it contains.  
+
+First we load the package and find the data folder
+```{r}
+library(rjca)
+deb <- system.file("extdata", "debate-by-speaker", package="rjca")
+dir(deb) ## list the files 
+```
+In case you are wondering, the prefix on the speaker names indicates whether they abstained, voted yes or voted no after the debate.
+
+Let's compute some summary statistics
+```{r}
+desc <- jca_desc(deb)
+head(desc) ## top of the file
+```
+This functions computes the number of words, number of word types, number of words that occurred exactly once, the proportion of all words used that were deployed in this document, the ratio of word types to word tokens, and the number of sentences, for each of the documents. 
+
+All the `jca_` functions run their java in the background and drop the results into a file or folder.  This function returned a data frame but also reported the temporary location where the output landed so you can look at it more closely if you want.
+
+Also common to all the functions is the possibility to add information about the documents, e.g. their file encoding and their locale.  Here we've taken the system default locale.  If we wanted to specify that the document were encoded in KOI8-R (a Russian encoding) then we would instead use
+```{r,eval=FALSE}
+desc <- jca_desc(deb, encoding='KOI8-R')
+```
+
+## Counting words
+
+To get a word frequency matrix for these documents we type
+```{r}
+wfmat <- jca_word(deb)
+dim(wfmat)
+```
+The output is a sparse matrix so we aren't storing thousands of zero counts.  If you want to work with it further, remember to load the Matrix package.
+
+Sometimes we'd prefer to do some filtering before constructing the matrix.  This function allows you to remove numbers, currency amounts, stop words (if you provide a list), and to reduce to word stems in several languages (using the snowball stemmer).  
+If we wanted to remove numbers and currency and apply a stemmer
+```{r}
+wfmat2 <- jca_word(deb, no.currency=TRUE, no.numbers=TRUE, stemmer='english')
+dim(wfmat2) ## rather smaller now
+```
+
+## Counting categories
+
+If we have a content analysis dictionary to hand we can count categories of words rather than words.  This has the additional advantage that we can count phrases too.  The dictionary for the Bara et al. study lives next to the documents
+```{r}
+dict <- system.file("extdata", "bara-et-al.ykd", package="rjca")
+```
+This one is in Yoshikoder format, an XML format that represents hierarchically structured content analysis dictionaries designed to work in the Yoshikoder.  However we can also use Lexicoder format dictionaries, VBPRO dictionaries, and experimentally LIWC format dictionaries too.  If you are writing them by hand you'll probably find VBPRO format the most convenient. See below for details.
+
+Let's run this dictionary over the debate
+```{r}
+debca <- jca_cat(dict, deb)
+head(debca)
+```
+The data.frame returned has documents as row names and on the columns, a depth first enumeration of the dictionary categories and a final column indicating how many words there were in each document.  This means that first column 'debate' contains the count of words or phrases (there are only words in this dictionary) that match any pattern in any category.  The next column 'debate_advocacy' is named to indicate that 'advocacy' is a subcategory of 'debate'.  The counts in all the subcategories of 'debate' will add up to the count in the 'debate' category, and so on downwards if there were more structure in this dictionary.
+
+The word counts are included so that it is possible to say that e.g. McNamara uses medical vocabulary at a rate of 32 words per thousand (because 96/3009 * 1000 = 31.9), in comparison to Deedes who use them at about 19 per thousand.  
+
+## Looking at words and categories in context
+
+If we want to see what sorts of things the dictionary is picking up in the documents we can arrange all the category matches in their local context.  This is a form of concordance, or keyword in context (KWIC).  Let's have a look at the medical category.
+```{r}
+debconc <- jca_conc(deb, dictionary=dict, category='medical')
+head(debconc)
+```
+The words we are matching are aligned in the middle of the second column and the document in which they occur is noted for each instance in the left column.  Here
+the words we are looking at in context are: 'doctor', 'physical', 'mental', 'medical' and 'doctors'.
+
+## Reconfigure All The Things 
+
+### Mac people
+
+If you are on a Mac you were probably prompted by a dialog to install a Java virtual machine.  Following these instruction, you'll land at an Apple web page and get something to install.  This is in fact the wrong (and quite elderly) version of Java, but you should install it anyway to stop that dialog coming back.  In principle there's no problem having various Java versions around.
+
+Now that you've done that, we'll reconfigure R to recognise the new version. In a Terminal window type
+
+    touch ~/.bash_profile
+    open -e ~/.bash_profile
+       
+and drop the following lines in the file that just opened up in TextEdit
+
+    export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+    export PATH=$JAVA_HOME/bin:$PATH
+
+Save that file, open up a fresh Terminal window, and type
+
+    sudo R CMD javareconf
+    
+(this will prompt you for your login password first). Now back in R type
+
+    install.packages('rJava', type='source')
+    
+This will recompile the package to take into account the presence of a new version of Java.  
+
+Or it should.  If it doesn't you might want to read [this](http://andrewgoldstone.com/blog/2015/02/03/rjava/), blogged under the very appropriate tag 'kludgetastic'.  At some point Java, rJava, and RStudio probably play nicely together again.  I look forward to it.  
+
+### Windows people
+
+In the unlikely event you need to look here, I can't help.
+
+### Linux people
+
+Have a look at the 'Mac People' instructions above.  They should work for you too, particularly if you use R from the a Terminal window (just type R), rather than in one of its GUIs.

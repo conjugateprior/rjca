@@ -132,7 +132,19 @@ get_encoding <- function(){
 ##'   back as a data.frame.  Defaults to a temporary folder}
 ##'  \item{\code{progress}: }{Whether to show the progress of the java code as it goes
 ##'  through the \code{files}}
+##'  \item{\code{no.currency}: }{Whether to remove currency. Defaults to FALSE}
+##'  \item{\code{no.numbers}: }{Whether to remove numbers. Defaults to FALSE}
+##'  \item{\code{stopwords}: }{File of stop words not to count. By default
+##'  every word is counted}
+##'  \item{\code{stemmer}: }{A language specific stemmer. By default nothing is stemmed.}
 ##' }
+##'
+##' Available stemmer languages are \code{danish}, \code{dutch}, \code{english},
+##' \code{finnish}, \code{french}, \code{german}, \code{hungarian}, \code{italian},
+##' \code{norwegian}, \code{portuguese}, \code{romanian}, \code{russian},
+##' \code{spanish}, \code{swedish}, \code{turkish}.  These are snowball project stemmers
+##' so I can't vouch for them.
+##'
 ##' This function also dumps the location of the temporary folder where the
 ##' results landed to
 ##' standard error in case you want the original csv data file and yoshikoder dictionary
@@ -195,8 +207,8 @@ jca_word <- function(files, ...) {
 #' @import Matrix
 read_mtx <- function(folder){
   ff <- readMM(file.path(folder, "data.mtx"))
-  rown <- read.csv(file.path(folder, "docs.csv", encoding="UTF-8"), header=FALSE)$V1
-  coln <- read.csv(file.path(folder, "words.csv", encoding="UTF-8"), header=FALSE)$V1
+  rown <- read.csv(file.path(folder, "docs.csv"), encoding="UTF-8", header=FALSE)$V1
+  coln <- read.csv(file.path(folder, "words.csv"), encoding="UTF-8", header=FALSE)$V1
   dimnames(ff) <- list(documents=rown, words=coln)
   ff
 }

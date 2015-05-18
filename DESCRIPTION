@@ -10,3 +10,5 @@ License: GPL
 Imports: rJava, Matrix, XML
 SystemRequirements: Java (>= 1.8)
 LazyData: TRUE
+Suggests: knitr
+VignetteBuilder: knitr
