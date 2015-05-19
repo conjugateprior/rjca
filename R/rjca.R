@@ -358,6 +358,41 @@ dict_slice <- function(df, level=1, tidy=TRUE){
   dd
 }
 
+##' Drive the single liner
+##'
+##' Puts a set of documents into a single file, in the way Mallet likes.
+##'
+##' Optional arguments are
+##' \itemize{
+##'  \item{\code{locale}: }{Locale in ISO format, e.g. "en_US".
+##'    Defaults to whatever \code{get_locale} returns}
+##'  \item{\code{encoding}: }{the file encoding of the \code{files}. Defaults to the
+##'  result of \code{get_encoding}}
+##' }
+##'
+##' @param files a list of file and folder names
+##' @param filename the single file you want the contents of \code{files} in
+##' @param ... extra arguments to control the process. See Details.
+##' @export
+##' @import rJava
+jca_line <- function(files, filename, ...) {
+
+  defaults <- list(locale=get_locale(), encoding=get_encoding(),
+                   progress=TRUE,
+                   output=path.expand(filename))
+  control <- insert_defaults(list(...), defaults)
+
+  cc <- .jnew("org/conjugateprior/ca/app/SingleLiner")
+  .jcall(cc, "V", "setEncoding", control$encoding)
+  .jcall(cc, "V", "setLocale", control$locale)
+
+  .jcall(cc, "V", "setFiles", .jarray(sapply(files, path.expand)))
+  .jcall(cc, "V", "setOutputFile", .jnew("java/io/File", control$output))
+
+  .jcall(cc, "V", "processFiles")
+}
+
+
 #' rjca: A package for driving jca java code.
 #'
 #' The rjca package provides functions to count words, count categories
