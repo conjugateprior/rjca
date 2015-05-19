@@ -44,14 +44,15 @@ It is worth noting that, whatever encoding the documents arrive in, the output o
 
 ## Counting words
 
-To get a word frequency matrix for these documents we type
+To get a word frequency matrix for these documents 
 ```{r}
 wfmat <- jca_word(deb)
 dim(wfmat)
 ```
 The output is a sparse matrix so we aren't storing the thousands of zero counts that inevitably occur.  If you want to work with it further, remember to load the Matrix package.
 
-Sometimes we'd prefer to do some filtering before constructing the matrix.  This function allows you to remove numbers, currency amounts, stop words (if you provide a list), and to reduce to word stems in several languages (using the snowball stemmer).  
+Sometimes we'd prefer to do some filtering before constructing the matrix.  This function allows you to remove numbers, currency amounts, stop words (if you provide a filename with the words in it), and to reduce to word stems in several languages using the snowball stemmer.
+
 For example, if we wanted to remove numbers and currency and apply a stemmer
 ```{r}
 wfmat2 <- jca_word(deb, no.currency=TRUE, no.numbers=TRUE, stemmer='english')
@@ -60,37 +61,61 @@ dim(wfmat2) ## now rather smaller
 
 ## Counting categories
 
-If we have a content analysis dictionary to hand we can count categories of words rather than words.  This has the additional advantage that we can count phrases too.  The dictionary for the Bara et al. study lives next to the documents
+Counting words is fun but counting categories are funner.  Using a content analysis dictionary also allows us to define and count phrases.  
+
+We'll use the dictionary for the Bara et al. study.  This lives next to the documents in the package
 ```{r}
 dict <- system.file("extdata", "bara-et-al.ykd", package="rjca")
 ```
-This one is in Yoshikoder format, an XML format that represents hierarchically structured content analysis dictionaries designed to work in the Yoshikoder software.  However we can also use Lexicoder dictionaries, VBPRO dictionaries, LIWC  dictionaries, and rather experimentally, Wordstat dictionaries too.  If you are writing such things by hand you'll probably find VBPRO format the most convenient. See below for details.
+The file is in Yoshikoder format, an XML format that represents hierarchically structured content analysis dictionaries and is designed to work in the Yoshikoder software.   However, the `jca_cat` and `jca_conc` functions accept dictionary files in the following formats, recognizing each from the suffix of the file
 
-Let's run this dictionary over the debate
+ * Yoshikoder (suffix `.ykd`)
+ * VBPro (suffix `.vbpro`)
+ * Lexicoder (suffix `.lcd`)
+ * LIWC (suffix: `.dic`)
+ * Wordstat (suffix `.CAT` *experimental*)
+
+The VBPro format is particularly convenient for throwing together a dictionary by hand in a hurry. Such dictionaries look like
+
+    >>Advocacy<<
+    object*
+    override
+    >>Religion<<
+    relig*
+    catholic church
+
+where the category names are anything between `>>` and `<<` and the words underneath are word or phrase patterns to match, one per line. You can write one of these in any text editor and hand it to the function as a dictionary (to be quite sure you're matching what you think you're matching, save the dictionary file as 'UTF-8'). 
+
+This format is reasonably flexible; you can use wildcards and multiword patterns, but the dictionary has no nested categories so you'll have to fake those with your category naming convention.
+
+OK, back to the content analysis.  Let's run this dictionary over the debate documents
 ```{r}
 debca <- jca_cat(dict, deb)
+head(debca) ## a bit messy
 ```
 
-Here's a subset of the data.frame output, skipping some rows and columns to make it easier to read 
+The root node of the dictionary gives it its name 'debate'. Hence the first column 'debate' contains the count of words or phrases (there are only words in this dictionary) that match any pattern in any category.  The next column 'debate_advocacy' is named to indicate that 'advocacy' is a subcategory of 'debate'.  Note that the counts in all the subcategories of 'debate' will add up to the count in the 'debate' category, and so on nestedly downwards if there were more structure in this dictionary.
 
-|                                | debate| debate_advocacy| debate_medical| debate_moral| WordCount|
-|:-------------------------------|------:|---------------:|--------------:|------------:|---------:|
-|abs-Mr William Deedes.txt       |    201|              36|             28|           14|      1478|
-|abs-Sir John Hobson.txt         |    348|              36|             65|            9|      2808|
-|no-Mr Kevin McNamara.txt        |    406|              68|             96|            8|      3009|
-|no-Mr Norman St John-Stevas.txt |    318|              63|             50|           32|      2245|
-|no-Mr Peter Mahon.txt           |     13|               1|              1|            1|        70|
-|no-Mr William Wells.txt         |    354|              61|             73|           21|      2606|
+The document word counts are included so that it is possible to say that e.g. McNamara deploys words in the medical category at a rate of about 32 words per thousand (because 96/3009 * 1000 = 31.9) in comparison to Deedes who use them at about 19 per thousand.  
 
-The first column 'debate' contains the count of words or phrases (there are only words in this dictionary) that match any pattern in any category.  The next column 'debate_advocacy' is named to indicate that 'advocacy' is a subcategory of 'debate'.  Note that the counts in all the subcategories of 'debate' will add up to the count in the 'debate' category, and so on nestedly downwards if there were more structure in this dictionary.
+By dividing the subcategory counts by the 'debate' column we get the proportions of words each deploys on the medical topic, disregarding all the words that are not categorised by the dictionary. 
 
-The word counts are included so that it is possible to say that e.g. McNamara uses medical vocabulary at a rate of 32 words per thousand (because 96/3009 * 1000 = 31.9), in comparison to Deedes who use them at about 19 per thousand.  
+For more complex dictionaries there are some subtleties to using this flattened output.  For most purposes you can just use the convenience function `dict_slice`. 
 
-There are some subtleties in using this output.  Read on for a discussion, or just skip to the next major seection see how to make concordances. 
+For example, here we'll slice the dictionary at level 1, that is: the top level categories, one level down from the root (any lower level category counts will be nested) in these
+```{r}
+debca1 <- dict_slice(debca, level=1)
+```
+The top of the output now looks more friendly
+```{r,results='asis',echo=FALSE}
+knitr::kable(head(debca1))
+```
+
+The next section has a discussion of the ins and outs of  hierarchical dictionaries and pattern matching.  Alternatively you could just skip to the next major section to see how to make concordances. 
 
 ### Hierarchical dictionaries
 
-Because dictionaries are hierarchically structured (and have an extra column with word counts) naive row totals will almost never add up to the number of matches in the document.  This matters when you want to treat the output as a contingency table, and gets more extreme the more nesting there is among the dictionary categories.
+Because dictionaries are hierarchically structured (and have an extra column with word counts) simple row totals will almost never add up to the number of matches in the document.  This matters when you want to treat the output as a contingency table, and gets more extreme the more nesting there is among the dictionary categories.
 
 For example, assume that the `moral` category has within it two subcategories that distinguish religious and church-related language `church`, from general ethical considerations `ethical`. Further assume that all `moral` patterns are in one or other of these two subcategories.  Then the output would contain two extra columns corresponding to the subcategories
 
@@ -106,20 +131,7 @@ But not even *this* will be true if there are patterns considered to be `moral` 
 
 The upshot is: be careful what parts of the output you pass on to other tools.
 
-### Preparing for later analysis
-
-If you are planning to analyse your data using statistical tools that assume a *contingency table* structure, then the duplicated counts from a hierarchical dictionary are probably not what you want.  In these cases, pick a level of analysis and then remove the columns counting the sub and super categories.
-
-For example, an appropriate contingency table can be constructed from the output constructed above as follows
-```{r}
-debca.table <- debca[,-c(1,ncol(debca))] # remove root and word count
-rowSums(debca.table) == debca[,1] # not always true!
-```
-
-
-For example, if you want to look at the relative emphasis of speakers across the six top-level content analysis categories in this dictionary you should first delete the first column `debate` and the last column `WordCount` and any subcategories of `moral`.  
-
-(And if for some reason you needed an extra column counting 'words that were not captured by any content analysis category' you would want to create it as an extra column by subtracting `debate` from `WordCount` before you got rid of them).
+If you are planning to analyse your data using statistical tools that assume a *contingency table* structure, then the duplicated counts from a hierarchical dictionary are probably not what you want.  In these cases, pick a level of analysis and then remove the columns counting the sub and super categories with `dict_slice`.
 
 ### Pattern matching 
 
@@ -160,24 +172,5 @@ Searching instead for the pattern `'medical *'` will show all pairs of words whe
 
 The asterisk is a wildcard that can be embedded in strings too, e.g. `'profess*'` will pick up all words starting with these letters.
 
-## Dictionary formats
 
-The `bara-et-al.ykd` dictionary is saved from the Yoshikoder content analysis software, but if you don't use that application you probably have your dictionary in a different format. The `jca_cat` and `jca_conc` functions accept dictionary files in the following additional formats, recognizing each from the suffix of the file
 
- * VBPro (suffix `.vbpro`)
- * Lexicoder (suffix `.lcd`)
- * LIWC (suffix: `.dic`)
- * Wordstat (suffix `.CAT`)
-
-The VBPro format is particularly convenient for throwing together a dictionary in a hurry. Such dictionaries look like
-
-    >>Advocacy<<
-    object*
-    override
-    >>Religion<<
-    relig*
-    catholic church
-
-where the category names are anything between `>>` and `<<` and the words underneath are word or phrase patterns to match, one per line. You can write one of these in any text editor and hand it to the function as a dictionary (to be quite sure you're matching what you think you're matching, save the dictionary file as 'UTF-8'). 
-
-This format is reasonably flexible; you can use wildcards and multiword patterns, but the dictionary has no nested categories so you'll have to fake those with your category naming convention.

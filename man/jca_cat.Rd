@@ -17,7 +17,10 @@ jca_cat(dictionary, files, ...)
 a data.frame containing the content analysis results
 }
 \description{
-Drive the category counter.  Optional arguments are
+Drive the category counter.  See details for possible extra arguments.
+}
+\details{
+Optional arguments are
 \itemize{
  \item{\code{locale}: }{Locale in ISO format, e.g. "en_US".
    Defaults to whatever \code{get_locale} returns}
@@ -35,8 +38,7 @@ This function also dumps the location of the temporary folder where the
 results landed to
 standard error in case you want the original csv data file and yoshikoder dictionary
 translation.
-}
-\details{
+
 The output is a data.frame with documents as row names, dictionary categories as
 column names and counts of how many words in each document matched patterns in that
 category.  Dictionaries are hierarchically structured so category names are sorted

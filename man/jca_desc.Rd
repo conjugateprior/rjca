@@ -15,7 +15,10 @@ jca_desc(files, ...)
 a data.frame containing brief document descriptions
 }
 \description{
-Drive the document describer.  Optional arguments are
+Drive the document describer.  See details for possible extra arguments.
+}
+\details{
+Optional arguments are
 \itemize{
  \item{\code{locale}: }{Locale in ISO format, e.g. "en_US".
    Defaults to whatever \code{get_locale} returns}

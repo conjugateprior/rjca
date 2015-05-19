@@ -13,11 +13,11 @@ vignette: >
 
 You want to install the 'JDK' for the latest version of the Java language.  As of 9 May 2015 the latest version of Java is called `Java SE 8u45`.  There are three steps:
 
-  1. Pressing the big square button with a stylized coffee cup and the words 'Java' and 'Download' on [this page](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+ 1. Press the big square button with a stylized coffee cup and the words 'Java' and 'Download' on [this page](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
-2. You're now on a page entitled 'Java SE Development Kit 8 Downloads'.  Press the radio button marked 'Accept License Agreement' and click on the link associated with your operating system.
+ 2. You're now on a page entitled 'Java SE Development Kit 8 Downloads'.  Press the radio button marked 'Accept License Agreement' and click on the link associated with your operating system.
 
-3. Now it's time to persuade R to talk to Java.  You can do this by
+ 3. Now it's time to persuade R to talk to Java.  You can do this by
 
     install.packages('rJava')
 
@@ -31,16 +31,15 @@ and if that works without complaint, check the version of Java that R sees.
     .jnew("java/lang/System")$getProperty("java.specification.version")
 
 It should say "1.8".  If it does not, you need to reconfigure some things before
-carrying on.  Have a look below for the
-gory details.
+carrying on.  Have a look below for the gory details.
 
 ## Reconfigure All The Things
 
 ### Mac people
 
-If you are on a Mac you were probably prompted by a dialog to install a Java virtual machine.  Following these instruction, you'll land at an Apple web page and get something to install.  This is in fact the wrong (and quite elderly) version of Java, but you should install it anyway to stop that dialog coming back.  In principle there's no problem having various Java versions around.
+If you are on a Mac you were probably prompted by a dialog to install Java.  Following these instruction, you'll land at an Apple web page and get something to install.  This is in fact the wrong version of Java (1.6 and no longer supported), but you should install it anyway to stop that dialog coming back.  In principle there's no problem having various Java versions around.
 
-Now that you've done that, we'll reconfigure R to recognise the new version. In a Terminal window type
+Now that you've done that, we'll reconfigure R to recognise the new version you've put in first. In a Terminal window type
 
     touch ~/.bash_profile
     open -e ~/.bash_profile

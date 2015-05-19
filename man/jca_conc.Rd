@@ -16,6 +16,7 @@ a data.frame containing
 }
 \description{
 Drive the concordancer and return the concordance as a data.frame.
+See details for possible extra arguments.
 }
 \details{
 Possible extra arguments are

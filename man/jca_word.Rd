@@ -16,6 +16,9 @@ a sparse Matrix containing the word counts
 }
 \description{
 Drive the word counter and return a sparse matrix containing word counts.
+See details for possible extra arguments.
+}
+\details{
 Optional arguments are
 \itemize{
  \item{\code{locale}: }{Locale in ISO format, e.g. "en_US".
@@ -32,8 +35,7 @@ Optional arguments are
  every word is counted}
  \item{\code{stemmer}: }{A language specific stemmer. By default nothing is stemmed.}
 }
-}
-\details{
+
 Available stemmer languages are \code{danish}, \code{dutch}, \code{english},
 \code{finnish}, \code{french}, \code{german}, \code{hungarian}, \code{italian},
 \code{norwegian}, \code{portuguese}, \code{romanian}, \code{russian},
