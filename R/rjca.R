@@ -88,8 +88,6 @@ jca_desc <- function(files, ...) {
                                                   fileext=".csv"))
   control <- insert_defaults(list(...), defaults)
 
-  print(control)
-
   cc <- .jnew("org/conjugateprior/ca/app/Description")
   .jcall(cc, "V", "setEncoding", control$encoding)
   .jcall(cc, "V", "setLocale", control$locale)
