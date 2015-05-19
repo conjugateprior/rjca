@@ -357,3 +357,15 @@ dict_slice <- function(df, level=1, tidy=TRUE){
                                   function(x){ x[length(x)]}))
   dd
 }
+
+#' rjca: A package for driving jca java code.
+#'
+#' The rjca package provides functions to count words, count categories
+#' using a content analysis dictionary, and generate concordances for words
+#' or categories.
+#'
+#' @docType package
+#' @name rjca
+NULL
+#> NULL
+
