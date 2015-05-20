@@ -172,5 +172,6 @@ Searching instead for the pattern `'medical *'` will show all pairs of words whe
 
 The asterisk is a wildcard that can be embedded in strings too, e.g. `'profess*'` will pick up all words starting with these letters.
 
+If you just want to view the concordance, you can also ask to have it opened in a web browser by setting `open.browser` to TRUE.  If you are actually more interested in sorting matches by pattern then you'll need to set `prettyprint` to FALSE so that the output has three columns not two, where the second starts with the words the collocation line is centred on.
 
 

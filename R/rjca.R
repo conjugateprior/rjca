@@ -243,6 +243,10 @@ read_mtx <- function(folder){
 ##'  \item{\code{category}: }{optional name of a category within \code{dictionary}}
 ##'  \item{\code{pattern}: }{a word or phrase, possible containing wildcard character '*'}
 ##'  \item{\code{window}: }{how many words either side to show}
+##'  \item{\code{prettyprint}: }{Whether to paste an aligned collocation in result data.frame.
+##'   Defaults to TRUE}
+##'   \item{\code{open.browser}: }{Whether to try to open the concordance as a web page.
+##'   Defaults to FALSE}
 ##' }
 ##'
 ##' Either \code{dictionary} or \code{pattern} must be provided.  If \code{dictionary} is
@@ -252,6 +256,19 @@ read_mtx <- function(folder){
 ##' This function also dumps the location of the temporary folder where the
 ##' results landed to standard error in case you want the original html data file
 ##' from which the data.frame was extracted.
+##'
+##' When the prettyprint option is FALSE the returned data.frame has three columns. The
+##' first is the document from which the collocation line occurs, the second is the
+##' left hand side of the collocation (the \code{window} words leading up to the
+##' pattern match), and the third is the pattern match and the \code{window} words
+##' succeeding it. Choose this option if e.g. you want to sort the data.frame by
+##' match rather than by document, the default.  If you just want to look at the
+##' results aligned on the match then the default TRUE setting will be fine.
+##'
+##' Note that you can also view the original webpage from which this function
+##' scrapes the data.frame.  It is in the folder that the function names
+##' and is called 'concordance.html'.  If you set \code{open.browser} to TRUE then R will
+##' attempt to open this file in a web browser.
 ##'
 ##' Note: Concordances can get big.  This function does not try to be efficient.
 ##'
@@ -265,7 +282,8 @@ jca_conc <- function(files, ...) {
   defaults <- list(locale=get_locale(), encoding=get_encoding(),
                    progress=TRUE, output=tempfile(pattern="jca_conc"),
                    pattern=FALSE, dictionary=FALSE,
-                   category=FALSE, window=5)
+                   category=FALSE, window=5,
+                   prettyprint=TRUE, open.browser=FALSE)
 
   control <- insert_defaults(list(...), defaults)
   if (is.null(control$pattern) && is.null(control$dictionary))
@@ -289,10 +307,15 @@ jca_conc <- function(files, ...) {
 
   .jcall(cc, "V", "processFiles")
   message("Folder is ", control$output)
+  if (control$open.browser)
+    browseURL(file.path(control$output, 'concordance.html'))
 
   df <- readHTMLTable(file.path(control$output, "concordance.html"),
                                 header=TRUE, colClasses='character')
-  tidy_conc(df$conctable)
+  if (control$prettyprint)
+    tidy_conc(df$conctable)
+  else
+    df$conctable
 }
 
 #' Turn jca_conc output into something that looks like a concordance
