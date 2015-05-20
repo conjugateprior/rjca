@@ -271,7 +271,7 @@ read_mtx <- function(folder){
 ##' and is called 'concordance.html'.  If you set \code{open.browser} to TRUE then R will
 ##' attempt to open this file in a web browser.
 ##'
-##' Note: Concordances can get big.  This function does not try to be efficient.
+##' Note: Concordances can get big but this function does not try to be efficient.
 ##'
 ##' @param files a list of file and folder names
 ##' @param ... extra arguments to control the process. See Details.
