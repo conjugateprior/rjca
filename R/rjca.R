@@ -258,12 +258,13 @@ read_mtx <- function(folder){
 ##' from which the data.frame was extracted.
 ##'
 ##' When the prettyprint option is FALSE the returned data.frame has three columns. The
-##' first is the document from which the collocation line occurs, the second is the
-##' left hand side of the collocation (the \code{window} words leading up to the
+##' first is the document from which the collocation line occurs 'Document', the second is the
+##' left hand side of the collocation 'LHS' (the \code{window} words leading up to the
 ##' pattern match), and the third is the pattern match and the \code{window} words
-##' succeeding it. Choose this option if e.g. you want to sort the data.frame by
+##' succeeding it 'Match.RHS'. Choose this option if e.g. you want to sort the data.frame by
 ##' match rather than by document, the default.  If you just want to look at the
-##' results aligned on the match then the default TRUE setting will be fine.
+##' results aligned on the match then the default TRUE setting will be fine.  Then
+##' the columns will be 'Document' and 'Concordance'.
 ##'
 ##' Note that you can also view the original webpage from which this function
 ##' scrapes the data.frame.  It is in the folder that the function names
