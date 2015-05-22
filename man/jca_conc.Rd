@@ -33,6 +33,10 @@ Possible extra arguments are
  \item{\code{category}: }{optional name of a category within \code{dictionary}}
  \item{\code{pattern}: }{a word or phrase, possible containing wildcard character '*'}
  \item{\code{window}: }{how many words either side to show}
+ \item{\code{prettyprint}: }{Whether to paste an aligned collocation in result data.frame.
+  Defaults to TRUE}
+  \item{\code{open.browser}: }{Whether to try to open the concordance as a web page.
+  Defaults to FALSE}
 }
 
 Either \code{dictionary} or \code{pattern} must be provided.  If \code{dictionary} is
@@ -43,6 +47,20 @@ This function also dumps the location of the temporary folder where the
 results landed to standard error in case you want the original html data file
 from which the data.frame was extracted.
 
-Note: Concordances can get big.  This function does not try to be efficient.
+When the prettyprint option is FALSE the returned data.frame has three columns. The
+first is the document from which the collocation line occurs 'Document', the second is the
+left hand side of the collocation 'LHS' (the \code{window} words leading up to the
+pattern match), and the third is the pattern match and the \code{window} words
+succeeding it 'Match.RHS'. Choose this option if e.g. you want to sort the data.frame by
+match rather than by document, the default.  If you just want to look at the
+results aligned on the match then the default TRUE setting will be fine.  Then
+the columns will be 'Document' and 'Concordance'.
+
+Note that you can also view the original webpage from which this function
+scrapes the data.frame.  It is in the folder that the function names
+and is called 'concordance.html'.  If you set \code{open.browser} to TRUE then R will
+attempt to open this file in a web browser.
+
+Note: Concordances can get big but this function does not try to be efficient.
 }
 

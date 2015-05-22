@@ -2,7 +2,7 @@
 % Please edit documentation in R/rjca.R
 \name{read_mtx}
 \alias{read_mtx}
-\title{Read the a word frequency matrix in Matrix Market format}
+\title{Read a word frequency matrix in Matrix Market format}
 \usage{
 read_mtx(folder)
 }
