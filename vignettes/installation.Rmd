@@ -62,17 +62,17 @@ Press the blue button there to download the installer, and run it.
   
  3. Make a Desktop link to launch RStudio. To do this, open a Terminal window (you'll find the Terminal in the Utilities folder inside your Applications folder) and paste the following two lines into it
  
-         touch ~/Desktop/LaunchRStudio.command
-         open -e ~/Desktop/LaunchRStudio.command
+          touch ~/Desktop/LaunchRStudio.command
+          open -e ~/Desktop/LaunchRStudio.command
  
     The second will open a TextEdit window.  Into that window paste the the following three line incantation
  
-        JVER=`java -version 2>&1 | head -n 1 | cut -d'"' -f 2`
-        DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk${JVER}.jdk/Contents/Home/jre/lib/server/
-        export DYLD_FALLBACK_LIBRARY_PATH 
-        open -a RStudio # replace with R if you'd prefer
+         JVER=`java -version 2>&1 | head -n 1 | cut -d'"' -f 2`
+         DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk${JVER}.jdk/Contents/Home/jre/lib/server/
+         export DYLD_FALLBACK_LIBRARY_PATH 
+         open -a RStudio # replace with R if you'd prefer
 
-    save the file, and close the TextEdit window.  
+     save the file, and close the TextEdit window.  
 
  4. Back in that Terminal window type
 
