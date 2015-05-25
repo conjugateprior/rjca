@@ -32,7 +32,20 @@ and if that works without complaint, check the version of Java that R sees by ty
     .jinit()
     .jnew("java/lang/System")$getProperty("java.specification.version")
 
-It should say "1.8".  If it does not, probably because you're on a Mac, then you need to kludge some things.  Read on...
+It should say "1.8".  If it does not, probably because you're on a Mac, then you need to read about the 'Mac Kudgerama' below.
+
+If it did work out then you can install rjca directly from Github.  
+
+## Getting rjca
+
+At your R prompt type
+
+    install.packages('devtools') ## if you don't already have it
+    devtools::install('conjugateprior/rjca')
+
+Now have a look at the introductory vignette to see what you can do with it
+
+    vignette('introduction', package='rjca')
 
 ## Mac Kludgerama
 
