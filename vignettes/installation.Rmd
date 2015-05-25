@@ -19,11 +19,11 @@ You want to install the 'JDK' for the latest version of the Java language.  As o
 
 ## Getting R to talk to Java
 
-Now it's time to persuade R to talk to your new Java installation.  You can do this by
+Now it's time to persuade R to talk to your new Java installation.  You can do this by typing 
 
     install.packages('rJava')
 
-If you're incredibly lucky, you're done.  In R, try typing
+in R.  If you're incredibly lucky, you're done.  Try typing
 
     library(rJava)
 
@@ -32,65 +32,72 @@ and if that works without complaint, check the version of Java that R sees by ty
     .jinit()
     .jnew("java/lang/System")$getProperty("java.specification.version")
 
-It should say "1.8".  If it does not, probably because you're on a Mac, then you need to read about the 'Mac Kudgerama' below.
+It should say 
 
-If it did work out then you can install rjca directly from Github.  
+    [1] "1.8"
+    
+If it does not then you're probably on a Mac and should read about the 'Mac Kludgerama' below.
 
-## Getting rjca
-
-At your R prompt type
-
-    install.packages('devtools') ## if you don't already have it
-    devtools::install('conjugateprior/rjca')
-
-Now have a look at the introductory vignette to see what you can do with it
-
-    vignette('introduction', package='rjca')
+If it *does* then you're good.  Skip down to the final section on installing rjca.
 
 ## Mac Kludgerama
 
 The following is a variant of Andrew Goldstone's [cunning workaround](http://andrewgoldstone.com/blog/2015/02/03/rjava/). I shall assume you want to use RStudio, but if you'd prefer to use the GUI that comes with R, then just replace every mention of `RStudio` with `R` in the instructions.  
 
-There are four steps:
+There are three steps:
 
- 1. Install a hopelessly out of date Java from Apple.  You may already have been prompted to 'install a virtual machine' during the process above.  If you did that already, great.  If you didn't, here's the link: [http://support.apple.com/kb/DL1572](http://support.apple.com/kb/DL1572).
+### Step 1
+
+Install a hopelessly out of date Java from Apple.  
+
+You may already have been prompted to 'install a virtual machine' during the process above.  If you did that already, great.  If you didn't, here's the link: [http://support.apple.com/kb/DL1572](http://support.apple.com/kb/DL1572).
 Press the blue button there to download the installer, and run it.  
     
- 2. Re-install the rJava package from source.  At an R prompt, type     
-    
-        install.packages("rJava", type='source')
+### Step 2
+
+Re-install the 'rJava' package from source.  
+
+At an R prompt, type     
+
+    install.packages("rJava", type='source')
   
- 3. Make a Desktop link to launch RStudio. To do this, open a Terminal window (you'll find the Terminal in the Utilities folder inside your Applications folder) and paste the following two lines into it
+### Step 3
+
+Make a Desktop link to launch RStudio.  
+
+Open a Terminal window (you'll find the Terminal in the Utilities folder inside your Applications folder) and paste the following two lines into it
  
-          touch ~/Desktop/LaunchRStudio.command
-          open -e ~/Desktop/LaunchRStudio.command
+    touch ~/Desktop/LaunchRStudio.command
+    open -e ~/Desktop/LaunchRStudio.command
  
-    The second will open a TextEdit window.  Into that window paste the the following three line incantation
+The second line opens a TextEdit window.  Into that window paste the the following alarming incantation
  
-         JVER=`java -version 2>&1 | head -n 1 | cut -d'"' -f 2`
-         DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk${JVER}.jdk/Contents/Home/jre/lib/server/
-         export DYLD_FALLBACK_LIBRARY_PATH 
-         open -a RStudio # replace with R if you'd prefer
+    #!/bin/bash
+          
+    JVER=`java -version 2>&1 | head -n 1 | cut -d'"' -f 2`
+    DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk${JVER}.jdk/Contents/Home/jre/lib/server/
+    export DYLD_FALLBACK_LIBRARY_PATH 
+    open -a RStudio # replace with R if you'd prefer
+    osascript -e 'tell application "Terminal" to close (every window whose name contains "LaunchRStudio.command")' &
+    exit
 
-     save the file, and close the TextEdit window.  
+Now save the file and close the TextEdit window.  
+     
+If you're curious, the incantation opens up a Terminal window to run itself, figures out which version of Java 1.8 you installed, opens a better informed version of RStudio that will play nicely with Java, and then tidies itself away once that's launched. 
 
- 4. Back in that Terminal window type
+## Getting rjca
 
-        chmod 755 ~/Desktop/LaunchRStudio.command
-    
-    and close that window too.  
- 
-Phew.  Now double-click the new file on the Desktop.  If all is well it will launch an RStudio window into which you can type 
+At an R prompt type
 
-    library(rjca)
-    
-without complaint.  
+    install.packages('devtools') ## if you don't already have it
+    devtools::install('conjugateprior/rjca')
 
-The RStudio that launches by clicking this Desktop thingy is just the same as the one that you get from the Applications folder except that we've set a library path that let's Java work properly.  So you can still launch RStudio the old way.
+and load the package
 
-If you've been having trouble with the 'mallet' package. This should fix those problems too.
+    load(rjca)
 
+and maybe have a look at the introductory vignette to see what you can do with it
 
+    vignette('introduction', package='rjca')
 
-
-
+If you've been following the Kludgerama, then you'll want to do all things rjca-related at an R prompt inside an RStudio that was launched by double-clicking that new file you just made on the Desktop.

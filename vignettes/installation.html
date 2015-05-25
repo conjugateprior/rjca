@@ -42,41 +42,62 @@
 </div>
 <div id="getting-r-to-talk-to-java" class="section level2">
 <h2>Getting R to talk to Java</h2>
-<p>Now it’s time to persuade R to talk to your new Java installation. You can do this by</p>
+<p>Now it’s time to persuade R to talk to your new Java installation. You can do this by typing</p>
 <pre><code>install.packages('rJava')</code></pre>
-<p>If you’re incredibly lucky, you’re done. In R, try typing</p>
+<p>in R. If you’re incredibly lucky, you’re done. Try typing</p>
 <pre><code>library(rJava)</code></pre>
 <p>and if that works without complaint, check the version of Java that R sees by typing</p>
 <pre><code>.jinit()
 .jnew(&quot;java/lang/System&quot;)$getProperty(&quot;java.specification.version&quot;)</code></pre>
-<p>It should say “1.8”. If it does not, probably because you’re on a Mac, then you need to kludge some things. Read on…</p>
+<p>It should say</p>
+<pre><code>[1] &quot;1.8&quot;</code></pre>
+<p>If it does not then you’re probably on a Mac and should read about the ‘Mac Kludgerama’ below.</p>
+<p>If it <em>does</em> then you’re good. Skip down to the final section on installing rjca.</p>
 </div>
 <div id="mac-kludgerama" class="section level2">
 <h2>Mac Kludgerama</h2>
 <p>The following is a variant of Andrew Goldstone’s <a href="http://andrewgoldstone.com/blog/2015/02/03/rjava/">cunning workaround</a>. I shall assume you want to use RStudio, but if you’d prefer to use the GUI that comes with R, then just replace every mention of <code>RStudio</code> with <code>R</code> in the instructions.</p>
-<p>There are four steps:</p>
-<ol style="list-style-type: decimal">
-<li><p>Install a hopelessly out of date Java from Apple. You may already have been prompted to ‘install a virtual machine’ during the process above. If you did that already, great. If you didn’t, here’s the link: <a href="http://support.apple.com/kb/DL1572"><a href="http://support.apple.com/kb/DL1572" class="uri">http://support.apple.com/kb/DL1572</a></a>. Press the blue button there to download the installer, and run it.</p></li>
-<li><p>Re-install the rJava package from source. At an R prompt, type</p>
-<p>install.packages(“rJava”, type=‘source’)</p></li>
-<li><p>Make a Desktop link to launch RStudio. To do this, open a Terminal window (you’ll find the Terminal in the Utilities folder inside your Applications folder) and paste the following two lines into it</p>
-<pre><code> touch ~/Desktop/LaunchRStudio.command
- open -e ~/Desktop/LaunchRStudio.command</code></pre></li>
-</ol>
-<p>The second will open a TextEdit window. Into that window paste the the following three line incantation</p>
-<pre><code>DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk$(java -version 2&gt;&amp;1 | head -n 1 | cut -d'&quot;' -f 2).jdk/Contents/Home/jre/lib/server/
+<p>There are three steps:</p>
+<div id="step-1" class="section level3">
+<h3>Step 1</h3>
+<p>Install a hopelessly out of date Java from Apple.</p>
+<p>You may already have been prompted to ‘install a virtual machine’ during the process above. If you did that already, great. If you didn’t, here’s the link: <a href="http://support.apple.com/kb/DL1572"><a href="http://support.apple.com/kb/DL1572" class="uri">http://support.apple.com/kb/DL1572</a></a>. Press the blue button there to download the installer, and run it.</p>
+</div>
+<div id="step-2" class="section level3">
+<h3>Step 2</h3>
+<p>Re-install the ‘rJava’ package from source.</p>
+<p>At an R prompt, type</p>
+<pre><code>install.packages(&quot;rJava&quot;, type='source')</code></pre>
+</div>
+<div id="step-3" class="section level3">
+<h3>Step 3</h3>
+<p>Make a Desktop link to launch RStudio.</p>
+<p>Open a Terminal window (you’ll find the Terminal in the Utilities folder inside your Applications folder) and paste the following two lines into it</p>
+<pre><code>touch ~/Desktop/LaunchRStudio.command
+open -e ~/Desktop/LaunchRStudio.command</code></pre>
+<p>The second line opens a TextEdit window. Into that window paste the the following alarming incantation</p>
+<pre><code>#!/bin/bash
+      
+JVER=`java -version 2&gt;&amp;1 | head -n 1 | cut -d'&quot;' -f 2`
+DYLD_FALLBACK_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk${JVER}.jdk/Contents/Home/jre/lib/server/
 export DYLD_FALLBACK_LIBRARY_PATH 
-open -a RStudio # replace with R if you'd prefer</code></pre>
-<p>save the file, and close the TextEdit window.</p>
-<ol start="4" style="list-style-type: decimal">
-<li><p>Back in that Terminal window type</p>
-<pre><code>chmod 755 ~/Desktop/LaunchRStudio.command</code></pre></li>
-</ol>
-<p>and close that window too.</p>
-<p>Now double-click the new file on the Desktop. If all is well it will launch an RStudio window into which you can type</p>
-<pre><code>library(rjca)</code></pre>
-<p>without complaint.</p>
-<p>The RStudio that launches by clicking this Desktop thingy is just the same as the one that you get from the Applications folder, except that we’ve set a library path that let’s Java work properly. If you’ve been having trouble with the ‘mallet’ package. This will fix that too.</p>
+open -a RStudio # replace with R if you'd prefer
+osascript -e 'tell application &quot;Terminal&quot; to close (every window whose name contains &quot;LaunchRStudio.command&quot;)' &amp;
+exit</code></pre>
+<p>Now save the file and close the TextEdit window.</p>
+<p>If you’re curious, the incantation opens up a Terminal window to run itself, figures out which version of Java 1.8 you installed, opens a better informed version of RStudio that will play nicely with Java, and then tidies itself away once that’s launched.</p>
+</div>
+</div>
+<div id="getting-rjca" class="section level2">
+<h2>Getting rjca</h2>
+<p>At an R prompt type</p>
+<pre><code>install.packages('devtools') ## if you don't already have it
+devtools::install('conjugateprior/rjca')</code></pre>
+<p>and load the package</p>
+<pre><code>load(rjca)</code></pre>
+<p>and maybe have a look at the introductory vignette to see what you can do with it</p>
+<pre><code>vignette('introduction', package='rjca')</code></pre>
+<p>If you’ve been following the Kludgerama, then you’ll want to do all things rjca-related at an R prompt inside an RStudio that was launched by double-clicking that new file you just made on the Desktop.</p>
 </div>
 
 
