@@ -14,9 +14,24 @@ jca_line(files, filename, ...)
 \item{...}{extra arguments to control the process. See Details.}
 }
 \description{
-Puts a set of documents into a single file, in the way Mallet likes.
+Puts a set of documents into a single file in one of the ways Mallet likes.
+This function creates lines of the form
 }
 \details{
+\code{folder-name | NoLabel} tab \code{filename} tab \code{file contents...}
+
+This is the format called 'one instance per file' on the Mallet pages
+(http://mallet.cs.umass.edu/import.php).  If you provide folder names to
+the \code{files} argument the first line element will be the folder name
+and the second element will be the names of file within it. If you provide filenames
+individually then the first line element will be 'NoLabel' and the second element
+will be the filename.  You can mix these.
+
+Note that you cannot provide folders of folders of files.  The function looks for
+files and folders in \code{files}.  For each of the folders it looks for files and adds
+them.  Then it stops looking.  Also, files or folders with names beginning
+with '.' will be ignored.
+
 Optional arguments are
 \itemize{
  \item{\code{locale}: }{Locale in ISO format, e.g. "en_US".

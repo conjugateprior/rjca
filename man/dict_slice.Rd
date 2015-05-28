@@ -4,14 +4,14 @@
 \alias{dict_slice}
 \title{Extract counts from a hierarchical dictionary}
 \usage{
-dict_slice(df, level = 1, tidy = TRUE)
+dict_slice(df, level = 1, subtree = TRUE)
 }
 \arguments{
 \item{df}{the dictionary output}
 
 \item{level}{which level of the dictionary to get counts for}
 
-\item{tidy}{whether to chop off the super category labels in the result}
+\item{subtree}{whether to show a full path from the dictionary root (default: FALSE)}
 }
 \value{
 dictionary results without super or sub category counts

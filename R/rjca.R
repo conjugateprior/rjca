@@ -365,23 +365,34 @@ insert_defaults <- function(lst, defs){
 #'
 #' @param df the dictionary output
 #' @param level which level of the dictionary to get counts for
-#' @param tidy whether to chop off the super category labels in the result
+#' @param subtree whether to show a full path from the dictionary root (default: FALSE)
 #' @return dictionary results without super or sub category counts
 #' @export
-dict_slice <- function(df, level=1, tidy=TRUE){
-  if (level==0)
-    return(df[,1,drop=FALSE]) ## special case
+dict_slice <- function(df, level=1, subtree=TRUE){
 
-  ff <- function(x){
-    # how many levels are marked in this column label?
-    length(grep("_", x, value=FALSE, fixed=TRUE))
+  wc <- df$WordCount
+  ## _ counts for each element of nms
+  count_underscores <- function(nms){ ## insane hoop jumping to count _
+    unlist(lapply(gregexpr("_", nms, fixed=TRUE),
+          function(x){ if (x[1]==-1) 0 else length(x) } ))
   }
-  indices <- which(sapply(colnames(df), ff)==level)
-  dd <- df[,indices]
-  if (tidy)
-    colnames(dd) <- unlist(lapply(strsplit(colnames(dd), "_"),
-                                  function(x){ x[length(x)]}))
-  dd
+  wanted_cols <- colnames(df)[count_underscores(colnames(df))==level]
+  dd <- df[, wanted_cols, drop=FALSE]
+
+  after_last_underscore <- function(x){
+    rr <- unlist(gregexpr("_", x, fixed=TRUE))
+    if (rr[1]==-1) rr <- 0
+    else rr <- rr[length(rr)] ## last one
+    rr+1
+  }
+  if (!subtree)
+    colnames(dd) <- sapply(colnames(dd),
+      function(x){ substr(x, after_last_underscore(x), nchar(x)) })
+
+  if (level==0)
+    dd
+  else
+    data.frame(dd, WordCount=wc, check.names=FALSE)
 }
 
 ##' Drive the single liner
