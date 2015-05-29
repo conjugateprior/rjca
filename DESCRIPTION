@@ -1,11 +1,11 @@
 Package: rjca
 Type: Package
 Title: R Interface to JCA Tools
-Version: 0.2
+Version: 0.2.1
 Date: 2015-05-25
 Author: Will Lowe
-Maintainer: <conjugateprior@gmail.com>
-Description: Wraps the Java content analysis tools in an R package.
+Maintainer: <will@conjugateprior.org>
+Description: Wraps the JCA content analysis tools in an R package.
 License: GPL
 Imports: rJava, Matrix, XML
 SystemRequirements: Java (>= 1.8)
